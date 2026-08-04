@@ -4,6 +4,9 @@ CMake library for Field Oriented Control on STM32 devices (update this later)
 ## Usage
 
 ### Adding to Project
+
+This project requires [EmbeddedLib](https://github.com/awesomeyooner/EmbeddedLib), please 'git clone'.
+
 To include this library, please `git clone` or `git submodule add` this repo into the `\lib` folder of your project
 
 Then add this to link the library
