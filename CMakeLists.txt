@@ -12,8 +12,11 @@ add_library(${PROJECT_NAME}
     src/foc_math.hpp
 
     # /devices
-    src/devices/as5047.cpp
-    src/devices/l298n.cpp
+        # /encoders
+        src/devices/encoders/as5047.cpp
+
+        # /drivers
+        src/devices/drivers/l298n.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
