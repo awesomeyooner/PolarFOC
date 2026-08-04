@@ -1,4 +1,4 @@
-#include "devices/as5047.hpp"
+#include "PolarFOC/devices/encoders/as5047.hpp"
 
 
 #define BIT_MODITY(src, i, val) ((src) ^= (-(val) ^ (src)) & (1UL << (i)))

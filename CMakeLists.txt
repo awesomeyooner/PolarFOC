@@ -9,7 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_library(${PROJECT_NAME}
 
     # /
-    src/foc_math.hpp
+    src/foc_math.cpp
 
     # /devices
         # /encoders
@@ -23,13 +23,11 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib>
-        $<INSTALL_INTERFACE:lib>
 )
 
-# This is for this project specifically
 target_link_libraries(${PROJECT_NAME}
-
+    PUBLIC 
+        EmbeddedLib
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
