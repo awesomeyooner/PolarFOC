@@ -8,6 +8,9 @@
 #include "usb_device.h"
 #include "gpio.h"
 
+#include "EmbeddedLib/math/math_util.hpp"
+#include "EmbeddedLib/status.hpp"
+
 #include <vector>
 #include <cmath>
 #include <stdint.h>
@@ -60,7 +63,7 @@ class AS5047
          * `NSS Signal Type` is up to the user
          * 
          */
-        void init();
+        status_utils::StatusCode init();
 
         /**
          * @brief Gets the encoder counts [ 0, 16384 ) in compensated mode 
@@ -107,10 +110,9 @@ class AS5047
          * @brief Gets the unbounded encoder rotations in radians in compensated or uncompensated mode
          * depending on the boolean passed in.
          * 
-         * @param compensated `bool = false` Set to `true` to return compensated values
          * @return `double` 
          */
-        double get_angle(bool compensated = false);
+        double get_angle();
 
         /**
          * @brief Gets the strength of the magnet in arbitrary units, higher is better.
@@ -119,6 +121,22 @@ class AS5047
          * @return `int` 
          */
         int get_magnetic_magnitude();
+
+        /**
+         * @brief Get the angle of the sensor either compensated or uncomensated mode depending on
+         * the boolean passed in.
+         * 
+         * @param compensated `bool = false` Set to `true` to return compensated values
+         */
+        void refresh(bool compensated = false);
+
+        /**
+         * @brief Set the angle offset in radians. This will affect `get_angle()` such that
+         * it returns `angle - offset`
+         * 
+         * @param radians 
+         */
+        void set_offset(double radians);
 
         /**
          * @brief Transmit a No-Operation command
@@ -156,10 +174,19 @@ class AS5047
          */
         uint16_t recieve();
 
+        /**
+         * @brief Get what mathematical quadrant the angle `radians` is in
+         * 
+         * @param radians `double`
+         * @return `int` 
+         */
+        int get_quadrant(double radians);
+
+
     private:
 
         // Counts per revolution
-        static constexpr int CPR = 16384; // 14 bits
+        static constexpr double CPR = 16384.0; // 14 bits
 
         static constexpr uint16_t UNCOMPENSATED_ANGLE_REGISTER = 0x3FFE;
         static constexpr uint16_t COMPENSATED_ANGLE_REGISTER = 0x3FFF;
@@ -183,6 +210,18 @@ class AS5047
         // SPI transaction timeout in milliseconds
         int m_timeout = 100; //ms
 
+        // The angle offset to apply in `get_angle` in radians
+        double m_angle_offset = 0;
+
+        // The current angle in radians
+        double m_angle = 0;
+
+        // The previous angle of the last update iteration in radians
+        double m_prev_angle = 0;
+
+        // The number of whole rotations the sensor has done
+        int m_num_rotations = 0;
+
         /**
          * @brief Select the sensor for SPI transactions. Pulls CS Low
          * 
@@ -202,6 +241,15 @@ class AS5047
          * @return `bool` 
          */
         bool is_parity_even(uint16_t data);
+
+
+        // /**
+        //  * @brief Get what mathematical quadrant the angle `radians` is in
+        //  * 
+        //  * @param radians `double
+        //  * @return `int` 
+        //  */
+        // int get_quadrant(double radians);
 
 
 }; // class AS5047

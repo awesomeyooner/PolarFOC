@@ -17,6 +17,9 @@ add_library(${PROJECT_NAME}
 
         # /drivers
         src/devices/drivers/l298n.cpp
+
+        # /motors
+        src/devices/motors/stepper_motor.cpp
 )
 
 target_include_directories(${PROJECT_NAME}

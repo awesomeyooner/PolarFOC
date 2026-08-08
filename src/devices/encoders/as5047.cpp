@@ -1,6 +1,10 @@
 #include "PolarFOC/devices/encoders/as5047.hpp"
 
 
+using namespace math;
+using namespace status_utils;
+
+
 #define BIT_MODITY(src, i, val) ((src) ^= (-(val) ^ (src)) & (1UL << (i)))
 #define BIT_READ(src, i) (((src) >> (i)&1U))
 #define BIT_TOGGLE(src, i) ((src) ^= 1UL << (i))
@@ -16,8 +20,9 @@ AS5047::AS5047(SPI_HandleTypeDef* spi, GPIO_TypeDef* GPIO_family, int pin_num, i
 } // end of "AS5047"
 
 
-void AS5047::init()
+StatusCode AS5047::init()
 {
+    return StatusCode::OK
 
 } // end of "init"
 
@@ -59,7 +64,7 @@ double AS5047::get_raw_rotations(bool compensated)
 double AS5047::get_raw_angle(bool compensated)
 {
     // Get the raw counts
-    double counts = compensated ? get_compensated_counts() : get_uncompensated_counts();
+    double counts = (double)get_raw_counts(compensated);
 
     // Rotations = counts / CPR
     // Radians = Rotations * 2PI
@@ -69,15 +74,14 @@ double AS5047::get_raw_angle(bool compensated)
 } // end of "get_raw_angle"
 
 
-double AS5047::get_angle(bool compensated)
+double AS5047::get_angle()
 {
-    // TODO: Add angle wrapping so it's not constrained from [0, 2Pi]
+    // Convert rotations to radians
+    double whole_radians = m_num_rotations * 2 * M_PI;
 
-    double raw_angle = get_raw_angle(compensated);
+    return whole_radians + m_angle - m_angle_offset;
 
-    return raw_angle;
-
-} // end of "get_angle"
+} // end of "get_angle()"
 
 int AS5047::get_magnetic_magnitude()
 {
@@ -85,7 +89,42 @@ int AS5047::get_magnetic_magnitude()
 
     return data & RESULT_MASK;
 
-} // end of "get_magnetic_magnitude"
+} // end of "get_magnetic_magnitude()"
+
+
+void AS5047::refresh(bool compensated)
+{
+    m_prev_angle = m_angle;
+
+    // double counts = get_raw_counts(compensated);
+    // int CPR = 16384;
+    // double angle = (counts / CPR) * 2 * M_PI;
+
+    // m_angle = get_raw_counts(compensated) / CPR;
+    m_angle = get_raw_angle(compensated);
+    // m_angle = ((double)get_raw_counts(compensated) / CPR) * 2 * M_PI;
+    // m_angle = (counts / CPR) * 2 * M_PI;
+
+    int prev_quadrant = get_quadrant(m_prev_angle);
+    int current_quadrant = get_quadrant(m_angle);
+
+    // If going from Q4 -> Q1
+    // Then you're going CCW, aka positive
+    if(prev_quadrant == 4 && current_quadrant == 1)
+        m_num_rotations++;
+    // If going from Q1 -> Q4
+    // Then you're going CW, aka negative
+    else if(prev_quadrant == 1 && current_quadrant == 4)
+        m_num_rotations--;
+
+} // end of "refresh(bool)"
+
+
+void AS5047::set_offset(double radians)
+{
+    m_angle_offset = radians;
+
+} // end of "set_offset(double)"
 
 
 void AS5047::NOP()
@@ -189,3 +228,17 @@ bool AS5047::is_parity_even(uint16_t data)
     return !(data & 1);
 
 } // end of "is_parity_even(uint16_t)"
+
+
+int AS5047::get_quadrant(double radians)
+{
+    double rotations = radians / (2 * M_PI);
+
+    // [0,      0.25  )  -> Q1
+    // [0.25,   0.5   )  -> Q2
+    // [0.5,    0.75  )  -> Q3
+    // [0.75,   1     )  -> Q4
+
+    return (rotations * 4) + 1;
+
+} // end of "get_quadrant(double)"
