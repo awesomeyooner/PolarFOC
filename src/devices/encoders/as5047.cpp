@@ -11,10 +11,9 @@ using namespace status_utils;
 
 
 AS5047::AS5047(SPI_HandleTypeDef* spi, GPIO_TypeDef* GPIO_family, int pin_num, int timeout)
+    : m_cs_pin(GPIO_family, pin_num)
 {
     m_spi = spi;
-    m_cs_family = GPIO_family;
-    m_cs_pin = pin_num;
     m_timeout = timeout;
 
 } // end of "AS5047"
@@ -214,7 +213,7 @@ uint16_t AS5047::recieve()
 void AS5047::select()
 {
     // Toggle pin LOW to activate CS
-    HAL_GPIO_WritePin(m_cs_family, m_cs_pin, GPIO_PIN_RESET);
+    m_cs_pin.set_low();
 
 } // end of "select()"
 
@@ -222,7 +221,7 @@ void AS5047::select()
 void AS5047::deselect()
 {
     // Toggle pin HIGH to activate CS
-    HAL_GPIO_WritePin(m_cs_family, m_cs_pin, GPIO_PIN_SET);
+    m_cs_pin.set_high();
 
 } // end of "deselect()"
 

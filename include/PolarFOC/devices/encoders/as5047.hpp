@@ -3,12 +3,12 @@
 #ifndef AS5047_HPP
 #define AS5047_HPP
 
+
 #include "spi.h"
-#include "tim.h"
 #include "usb_device.h"
-#include "gpio.h"
 
 #include "EmbeddedLib/math/math_util.hpp"
+#include "EmbeddedLib/devices/gpio_device.hpp"
 #include "EmbeddedLib/status.hpp"
 #include "EmbeddedLib/system.hpp"
 
@@ -200,11 +200,8 @@ class AS5047
         // The SPI handle to use
         SPI_HandleTypeDef* m_spi = nullptr;
 
-        // The CS pin family
-        GPIO_TypeDef* m_cs_family = nullptr;
-        
-        // The CS pin number
-        int m_cs_pin;
+        // The GPIO CS pin
+        GPIODevice m_cs_pin;
 
         // SPI transaction timeout in milliseconds
         int m_timeout = 100; //ms
