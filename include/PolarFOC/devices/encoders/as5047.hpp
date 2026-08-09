@@ -10,6 +10,7 @@
 
 #include "EmbeddedLib/math/math_util.hpp"
 #include "EmbeddedLib/status.hpp"
+#include "EmbeddedLib/system.hpp"
 
 #include <vector>
 #include <cmath>
@@ -115,6 +116,13 @@ class AS5047
         double get_angle();
 
         /**
+         * @brief Get the velocity in radians per second
+         * 
+         * @return `double` 
+         */
+        double get_velocity();
+
+        /**
          * @brief Gets the strength of the magnet in arbitrary units, higher is better.
          * Values from 4000 to 10000 are good.
          * 
@@ -174,15 +182,6 @@ class AS5047
          */
         uint16_t recieve();
 
-        /**
-         * @brief Get what mathematical quadrant the angle `radians` is in
-         * 
-         * @param radians `double`
-         * @return `int` 
-         */
-        int get_quadrant(double radians);
-
-
     private:
 
         // Counts per revolution
@@ -216,8 +215,14 @@ class AS5047
         // The current angle in radians
         double m_angle = 0;
 
+        // The current velocity in radians / sec
+        double m_velocity = 0;
+
         // The previous angle of the last update iteration in radians
         double m_prev_angle = 0;
+
+        // The previous timestamp since `refresh()` was called in seconds
+        double m_prev_timestamp_s = 0;
 
         // The number of whole rotations the sensor has done
         int m_num_rotations = 0;
@@ -243,13 +248,19 @@ class AS5047
         bool is_parity_even(uint16_t data);
 
 
-        // /**
-        //  * @brief Get what mathematical quadrant the angle `radians` is in
-        //  * 
-        //  * @param radians `double
-        //  * @return `int` 
-        //  */
-        // int get_quadrant(double radians);
+        /**
+         * @brief Get what mathematical quadrant the angle `radians` is in
+         * 
+         * @param radians `double
+         * @return `int` 
+         */
+        int get_quadrant(double radians);
+
+        /**
+         * @brief Update the current velocity using the current angle and previous angle
+         *  
+         */
+        void update_velocity();
 
 
 }; // class AS5047

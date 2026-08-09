@@ -22,7 +22,7 @@ AS5047::AS5047(SPI_HandleTypeDef* spi, GPIO_TypeDef* GPIO_family, int pin_num, i
 
 StatusCode AS5047::init()
 {
-    return StatusCode::OK
+    return StatusCode::OK;
 
 } // end of "init"
 
@@ -83,6 +83,14 @@ double AS5047::get_angle()
 
 } // end of "get_angle()"
 
+
+double AS5047::get_velocity()
+{
+    return m_velocity;
+    
+} // end of "get_velocity()"
+
+
 int AS5047::get_magnetic_magnitude()
 {
     uint16_t data = read_data(MAGNETIC_MAGNITUDE_REGISTER);
@@ -116,6 +124,8 @@ void AS5047::refresh(bool compensated)
     // Then you're going CW, aka negative
     else if(prev_quadrant == 1 && current_quadrant == 4)
         m_num_rotations--;
+
+    update_velocity();
 
 } // end of "refresh(bool)"
 
@@ -242,3 +252,21 @@ int AS5047::get_quadrant(double radians)
     return (rotations * 4) + 1;
 
 } // end of "get_quadrant(double)"
+
+
+void AS5047::update_velocity()
+{
+    double current_time = System::get_seconds();
+
+    double dTheta = m_angle - m_prev_angle;
+    double dt = current_time - m_prev_timestamp_s;
+
+    // Avoid division by 0
+    if(dt == 0)
+        return;
+
+    m_velocity = dTheta / dt;
+    
+    m_prev_timestamp_s = current_time;
+
+} // end of "update_velocity()"
