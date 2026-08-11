@@ -255,7 +255,7 @@ int AS5047::get_quadrant(double radians)
 
 void AS5047::update_velocity()
 {
-    double current_time = System::get_seconds();
+    double current_time = System::get_seconds(true);
 
     double dTheta = m_angle - m_prev_angle;
     double dt = current_time - m_prev_timestamp_s;
