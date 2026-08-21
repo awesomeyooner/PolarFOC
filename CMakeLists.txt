@@ -20,6 +20,10 @@ add_library(${PROJECT_NAME}
 
         # /motors
         src/devices/motors/stepper_motor.cpp
+
+    # /filters
+    src/filters/filter.cpp
+    src/filters/low_pass_filter.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
