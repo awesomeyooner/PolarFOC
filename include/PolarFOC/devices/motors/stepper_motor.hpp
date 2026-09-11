@@ -4,7 +4,7 @@
 
 #include "stm32f4xx_hal.h"
 
-#include "PolarFOC/devices/drivers/l298n.hpp"
+#include "PolarFOC/devices/drivers/dual_pwm_driver.hpp"
 #include "PolarFOC/devices/encoders/as5047.hpp"
 
 #include "EmbeddedLib/math/vector2d.hpp"
@@ -25,7 +25,7 @@ class StepperMotor
 
         double get_input_voltage();
 
-        void link_drivers(L298N* phase_A, L298N* phase_B);
+        void link_drivers(DualPWMDriver* phase_A, DualPWMDriver* phase_B);
 
         void link_encoder(AS5047* encoder);
 
@@ -65,17 +65,17 @@ class StepperMotor
 
         AS5047* get_encoder();
 
-        L298N* get_phase_A();
+        DualPWMDriver* get_phase_A();
 
-        L298N* get_phase_B();
+        DualPWMDriver* get_phase_B();
 
         double m_openloop_angle = 0;
 
     private:
 
         AS5047* m_encoder = nullptr;
-        L298N* m_phase_A = nullptr;
-        L298N* m_phase_B = nullptr;
+        DualPWMDriver* m_phase_A = nullptr;
+        DualPWMDriver* m_phase_B = nullptr;
 
         // The number of pole pairs the stepper has. Typical 1.8 deg steppers have 50
         double m_pole_pairs = 50;

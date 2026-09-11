@@ -17,6 +17,7 @@ add_library(${PROJECT_NAME}
 
         # /drivers
         src/devices/drivers/l298n.cpp
+        src/devices/drivers/dual_pwm_driver.cpp
 
         # /motors
         src/devices/motors/stepper_motor.cpp

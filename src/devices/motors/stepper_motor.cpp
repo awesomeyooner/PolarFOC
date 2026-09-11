@@ -41,7 +41,7 @@ double StepperMotor::get_input_voltage()
 } // end of "get_input_voltage()"
 
 
-void StepperMotor::link_drivers(L298N* phase_A, L298N* phase_B)
+void StepperMotor::link_drivers(DualPWMDriver* phase_A, DualPWMDriver* phase_B)
 {
     m_phase_A = phase_A;
     m_phase_B = phase_B;
@@ -270,14 +270,14 @@ AS5047* StepperMotor::get_encoder()
 } // end of "get_encoder()"
 
 
-L298N* StepperMotor::get_phase_A()
+DualPWMDriver* StepperMotor::get_phase_A()
 {
     return m_phase_A;
 
 } // end of "get_phase_A()"
 
 
-L298N* StepperMotor::get_phase_B()
+DualPWMDriver* StepperMotor::get_phase_B()
 {
     return m_phase_B;
 
