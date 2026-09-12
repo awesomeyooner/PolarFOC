@@ -20,12 +20,25 @@ StatusCode ADCCurrentSensor::init()
 } // end of "init()"
 
 
-Vector2d ADCCurrentSensor::get_currents()
+Vector2d ADCCurrentSensor::get_phase_currents(double signumA, double signumB)
 {
     // I_out = V_IPROPI / (A_IPROPI * R_IPROPI)
-    return get_raw_voltages().divided_by(m_mirror_gain * m_resistor);
+    Vector2d currents = get_raw_voltages().divided_by(m_mirror_gain * m_resistor);
 
-} // end of "ADCCurrentSensor()"
+    // Apply signs
+    currents.times(math::sign(signumA), 0); // Phase A
+    currents.times(math::sign(signumB), 1); // Phase B
+
+    return currents;
+
+} // end of "get_phase_currents()"
+
+
+Vector2d ADCCurrentSensor::get_dq_currents(double el_angle)
+{
+    return get_phase_currents().inverse_rotate(el_angle);
+
+} // end of "get_phase_currents(double)"
 
 
 Vector2d ADCCurrentSensor::get_raw_voltages()

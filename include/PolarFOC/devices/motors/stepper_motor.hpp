@@ -6,6 +6,7 @@
 
 #include "PolarFOC/devices/drivers/dual_pwm_driver.hpp"
 #include "PolarFOC/devices/encoders/as5047.hpp"
+#include "PolarFOC/devices/current_sensors/adc_current_sensor.hpp"
 
 #include "EmbeddedLib/math/vector2d.hpp"
 
@@ -28,6 +29,10 @@ class StepperMotor
         void link_drivers(DualPWMDriver* phase_A, DualPWMDriver* phase_B);
 
         void link_encoder(AS5047* encoder);
+
+        void link_current_sensor(ADCCurrentSensor* sensor);
+
+        void link_voltage_sensor(ADCDevice* adc);
 
         status_utils::StatusCode init();
 
@@ -59,19 +64,31 @@ class StepperMotor
 
         double get_electrical_angle();
 
+        Vector2d get_phase_currents();
+
+        Vector2d get_dq_currents();
+
         void calibrate_pole_pairs(double voltage);
 
         void calibrate_angle_offset(double voltage);
 
+        void calibrate_input_voltage(double R1, double R2);
+
         double calculate_pole_pairs(double voltage);
 
         double calculate_angle_offset(double voltage);
+
+        double calculate_input_voltage(double R1, double R2);
 
         AS5047* get_encoder();
 
         DualPWMDriver* get_phase_A();
 
         DualPWMDriver* get_phase_B();
+
+        ADCCurrentSensor* get_current_sensor();
+
+        ADCDevice* get_voltage_sensor();
 
         double m_openloop_angle = 0;
 
@@ -80,6 +97,8 @@ class StepperMotor
         AS5047* m_encoder = nullptr;
         DualPWMDriver* m_phase_A = nullptr;
         DualPWMDriver* m_phase_B = nullptr;
+        ADCCurrentSensor* m_current_sensor = nullptr;
+        ADCDevice* m_voltage_sensor = nullptr;
 
         // The number of pole pairs the stepper has. Typical 1.8 deg steppers have 50
         double m_pole_pairs = 50;

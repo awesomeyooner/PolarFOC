@@ -7,6 +7,7 @@
 #include "EmbeddedLib/devices/adc_device.hpp"
 
 #include "EmbeddedLib/math/vector2d.hpp"
+#include "EmbeddedLib/math/math_util.hpp"
 
 
 /**
@@ -25,7 +26,9 @@ class ADCCurrentSensor
 
         status_utils::StatusCode init();
 
-        Vector2d get_currents();
+        Vector2d get_phase_currents(double signumA = 1, double signumB = 1);
+
+        Vector2d get_dq_currents(double el_angle);
 
     private:
 

@@ -56,17 +56,37 @@ void StepperMotor::link_encoder(AS5047* encoder)
 } // end of "link_encoder(AS5047*)"
 
 
+void StepperMotor::link_current_sensor(ADCCurrentSensor* sensor)
+{
+    m_current_sensor = sensor;
+
+} // end of "link_current_sensor(ADCCurrentSensor*)"
+
+
+void StepperMotor::link_voltage_sensor(ADCDevice* adc)
+{
+    m_voltage_sensor = adc;
+
+} // end of "link_voltage_sensor(ADCDevice*)"
+
+
 StatusCode StepperMotor::init()
 {
     StatusCode init_A = m_phase_A->init();
     StatusCode init_B = m_phase_B->init();
 
     StatusCode init_encoder = m_encoder->init();
+
+    StatusCode init_current_sensor = m_current_sensor ? m_current_sensor->init() : StatusCode::OK;
+
+    StatusCode init_voltage_sensor = m_voltage_sensor ? m_voltage_sensor->start_DMA() : StatusCode::OK;
     
     return combine_statuses({
         init_A,
         init_B,
-        init_encoder
+        init_encoder,
+        init_current_sensor,
+        init_voltage_sensor
     });
      
 } // end of "init()"
@@ -234,6 +254,30 @@ double StepperMotor::get_electrical_angle()
 } // end of "get_electrical_angle()"
 
 
+Vector2d StepperMotor::get_phase_currents()
+{
+    if(!m_current_sensor)
+        return {0, 0};
+
+    return m_current_sensor->get_phase_currents(
+        m_phase_A->get_percent(),
+        m_phase_B->get_percent()
+    );
+
+} // end of "get_phase_currents()"
+
+
+Vector2d StepperMotor::get_dq_currents()
+{
+    if(!m_current_sensor)
+        return {0, 0};
+
+    // DQ Currents is Park Transform of phase currents
+    return get_phase_currents().inverse_rotate(get_electrical_angle());
+
+} // end of "get_dq_currents()"
+
+
 void StepperMotor::calibrate_pole_pairs(double voltage)
 {
     m_pole_pairs = std::round(
@@ -250,6 +294,15 @@ void StepperMotor::calibrate_angle_offset(double voltage)
     );
 
 } // end of "calibrate_angle_offset(double)"
+
+
+void StepperMotor::calibrate_input_voltage(double R1, double R2)
+{
+    set_input_voltage(
+        calculate_input_voltage(R1, R2)
+    );
+    
+} // end of "calibrate_input_voltage(double, double)"
 
 
 double StepperMotor::calculate_pole_pairs(double voltage)
@@ -301,6 +354,20 @@ double StepperMotor::calculate_angle_offset(double voltage)
 } // end of "calculate_angle_offset(double)"
 
 
+double StepperMotor::calculate_input_voltage(double R1, double R2)
+{
+    if(m_voltage_sensor == nullptr)
+        return 0;
+
+    m_voltage_sensor->poll();
+
+    double Vout = m_voltage_sensor->get_voltage();
+
+    return math::R_divider(Vout, R1, R2);
+    
+} // end of "calculate_input_voltage()"
+
+
 AS5047* StepperMotor::get_encoder()
 {
     return m_encoder;
@@ -320,3 +387,17 @@ DualPWMDriver* StepperMotor::get_phase_B()
     return m_phase_B;
 
 } // end of "get_phase_B()"
+
+
+ADCCurrentSensor* StepperMotor::get_current_sensor()
+{
+    return m_current_sensor;
+
+} // end of "get_current_sensor()"
+
+
+ADCDevice* StepperMotor::get_voltage_sensor()
+{
+    return m_voltage_sensor;
+
+} // end of "get_voltage_sensor()"
