@@ -30,9 +30,11 @@ class ADCCurrentSensor
 
         Vector2d get_dq_currents(double el_angle);
 
-    private:
-
         Vector2d get_raw_voltages();
+
+        ADCDevice* get_adc();
+
+    private:
 
         ADCDevice m_adc;
 

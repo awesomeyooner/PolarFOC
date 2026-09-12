@@ -46,3 +46,10 @@ Vector2d ADCCurrentSensor::get_raw_voltages()
     return {m_adc.get_voltage(0), m_adc.get_voltage(1)};
 
 } // end of "get_raw_voltages()"
+
+
+ADCDevice* ADCCurrentSensor::get_adc()
+{
+    return &m_adc;
+
+} // end of "get_adc()"
