@@ -22,6 +22,9 @@ add_library(${PROJECT_NAME}
         # /motors
         src/devices/motors/stepper_motor.cpp
 
+        # /current_sensors
+        src/devices/current_sensors/adc_current_sensor.cpp
+
     # /filters
     src/filters/filter.cpp
     src/filters/low_pass_filter.cpp

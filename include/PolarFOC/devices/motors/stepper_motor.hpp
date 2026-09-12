@@ -59,9 +59,13 @@ class StepperMotor
 
         double get_electrical_angle();
 
+        void calibrate_pole_pairs(double voltage);
+
         void calibrate_angle_offset(double voltage);
 
-        double get_angle_offset(double voltage);
+        double calculate_pole_pairs(double voltage);
+
+        double calculate_angle_offset(double voltage);
 
         AS5047* get_encoder();
 

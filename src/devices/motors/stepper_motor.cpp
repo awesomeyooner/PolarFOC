@@ -234,16 +234,54 @@ double StepperMotor::get_electrical_angle()
 } // end of "get_electrical_angle()"
 
 
+void StepperMotor::calibrate_pole_pairs(double voltage)
+{
+    m_pole_pairs = std::round(
+        calculate_pole_pairs(voltage)
+    );
+
+} // end of "calibrate_pole_pairs(double)"
+
+
 void StepperMotor::calibrate_angle_offset(double voltage)
 {
     m_encoder->set_offset(
-        get_angle_offset(voltage)
+        calculate_angle_offset(voltage)
     );
 
 } // end of "calibrate_angle_offset(double)"
 
 
-double StepperMotor::get_angle_offset(double voltage)
+double StepperMotor::calculate_pole_pairs(double voltage)
+{
+    HAL_Delay(500);
+
+    m_encoder->refresh();
+    double starting = m_encoder->get_angle();
+
+    int steps = 20;
+
+    for(int i = 0; i < steps; i++)
+    {
+        m_encoder->refresh();
+        step(voltage);
+        HAL_Delay(20);
+    }
+
+    m_encoder->refresh();
+    double ending = m_encoder->get_angle();
+
+    double diff = fabs(starting - ending);
+
+    double rotations = diff / (2 * M_PI);
+
+    return (double)steps / rotations;
+    // return std::round((double)steps / rotations);
+
+} // end of "calculate_pole_pairs(double)"
+
+
+double StepperMotor::calculate_angle_offset(double voltage)
 {
     HAL_Delay(500);
 
@@ -260,7 +298,7 @@ double StepperMotor::get_angle_offset(double voltage)
 
     return m_encoder->get_angle();
 
-} // end of "get_angle_offset(double)"
+} // end of "calculate_angle_offset(double)"
 
 
 AS5047* StepperMotor::get_encoder()
