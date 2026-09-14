@@ -42,6 +42,10 @@ class StepperMotor
 
         void move();
 
+        void set_target_vd(double vd);
+
+        void set_target_vq(double vq);
+
         void set_target_voltage(double vq);
 
         void set_target_voltages(double vd, double vq);

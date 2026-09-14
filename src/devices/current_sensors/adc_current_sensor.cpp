@@ -26,10 +26,12 @@ Vector2d ADCCurrentSensor::get_phase_currents(double signumA, double signumB)
     Vector2d currents = get_raw_voltages().divided_by(m_mirror_gain * m_resistor);
 
     // Apply signs
-    currents.times(math::sign(signumA), 0); // Phase A
-    currents.times(math::sign(signumB), 1); // Phase B
+    // currents.times(math::sign(signumA), 0); // Phase A
+    // currents.times(math::sign(signumB), 1); // Phase B
 
-    return currents;
+    return currents
+                .times(math::sign(signumA), 0)  // Phase A
+                .times(math::sign(signumB), 1); // Phase B
 
 } // end of "get_phase_currents()"
 

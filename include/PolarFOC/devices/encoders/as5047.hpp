@@ -116,6 +116,15 @@ class AS5047
         double get_angle();
 
         /**
+         * @brief Gets the bounded encoder rotations in radians in compensated or uncompensated mode
+         * depending on the boolean passed in when calling `refresh`. This will return the angle, with the offset applied,
+         * bounded to `[0, 2pi]`
+         * 
+         * @return `double` The angle in radians from `[0, 2pi]` 
+         */
+        double get_bounded_angle();
+
+        /**
          * @brief Get the velocity in radians per second
          * 
          * @return `double` 

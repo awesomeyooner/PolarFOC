@@ -117,6 +117,21 @@ void StepperMotor::move()
 } // end of "move()"
 
 
+void StepperMotor::set_target_vd(double vd)
+{
+    m_target_voltage_d = vd;
+
+} // end of "set_target_vd(double)"
+
+
+void StepperMotor::set_target_vq(double vq)
+{
+    m_target_voltage_q = vq;
+
+} // end of "set_target_vd(double)"
+
+
+
 void StepperMotor::set_target_voltage(double vq)
 {
     m_target_voltage_q = vq;

@@ -83,6 +83,25 @@ double AS5047::get_angle()
 } // end of "get_angle()"
 
 
+double AS5047::get_bounded_angle()
+{
+    double angle = m_angle - m_angle_offset;
+
+    // Instead of using fmod, just subtract one whole 2pi since it'll only be within two full revolutions
+
+    // Greater than 2PI
+    if(angle > 2 * M_PI)
+        return angle - (2 * M_PI);
+    // Less than 0
+    else if(angle < 0)
+        return angle + (2 * M_PI);
+    // Angle is normalized to [0, 2pi]
+    else
+        return angle;
+
+} // end of "get_bounded_angle()"
+
+
 double AS5047::get_velocity()
 {
     return m_velocity;
